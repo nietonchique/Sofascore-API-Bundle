@@ -5,6 +5,18 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-06-13
+
+### Added
+- `http.crypto_method` config option — the minimum TLS version (a
+  `STREAM_CRYPTO_METHOD_TLSv1_*_CLIENT` constant), defaulting to TLS 1.3.
+
+### Fixed
+- SofaScore's Cloudflare returns a `403 "challenge"` on older TLS handshakes from
+  some clients (notably inside containers), independently of headers/IP. The HTTP
+  client now negotiates TLS 1.3 by default, which clears it. Override via
+  `http.crypto_method` for a different minimum.
+
 ## [2.0.0] - 2026-06-13
 
 ### Changed

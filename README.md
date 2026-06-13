@@ -177,6 +177,7 @@ sofascore_api:
     transport: chain          # http | chrome | chain
     http:
         timeout: 10.0
+        crypto_method: 768                # min TLS version; 768 = TLS 1.3 (default — Cloudflare 403s older handshakes)
         proxy: null                       # 'socks5h://127.0.0.1:1080'
         user_agent: null                  # override the default browser UA
         x_requested_with: null            # override the required header (default: random token)
@@ -265,11 +266,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends chromium \
 
 ## Troubleshooting
 
-- **Every request throws `ApiBlockedException` (403).** Two independent causes:
+- **Every request throws `ApiBlockedException` (403).** Three independent causes:
   1. the `X-Requested-With` header is missing — it is sent automatically, so this
      only happens if you overrode `http.headers` and dropped it;
   2. the exit IP is geo/reputation-blocked (e.g. Russia, some datacenter ranges).
-     Set `http.proxy` (and `chrome.proxy`) to a clean exit.
+     Set `http.proxy` (and `chrome.proxy`) to a clean exit;
+  3. an older TLS handshake — Cloudflare fingerprints it (seen from inside
+     containers even with a clean IP + header). The client defaults to TLS 1.3,
+     which clears it; if you lowered `http.crypto_method`, raise it back.
 - **`transport: chrome` fails with "class not found".** Install the optional
   dependency and make sure a Chromium binary is available:
   `composer require chrome-php/chrome` and set `chrome.binary`.

@@ -76,6 +76,7 @@ final class SofascoreApiBundle extends AbstractBundle
                 ->scalarNode('base_url')->defaultValue(HttpClientTransport::BASE_URL)->cannotBeEmpty()->end()
                 ->arrayNode('http')->addDefaultsIfNotSet()->children()
                     ->floatNode('timeout')->min(0.0)->defaultValue(10.0)->end()
+                    ->integerNode('crypto_method')->info('Minimum TLS version — one of the STREAM_CRYPTO_METHOD_TLSv1_*_CLIENT constants. Defaults to TLS 1.3: SofaScore\'s Cloudflare returns a 403 "challenge" on older TLS handshakes from some clients (e.g. inside containers), independently of headers/IP.')->defaultValue(\STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT)->end()
                     ->scalarNode('proxy')->defaultNull()->end()
                     ->scalarNode('user_agent')->info('Override the default browser User-Agent.')->defaultNull()->end()
                     ->scalarNode('x_requested_with')->info('Value for the required X-Requested-With header (default: a random token).')->defaultNull()->end()
@@ -137,7 +138,11 @@ final class SofascoreApiBundle extends AbstractBundle
         $services->set(Enums::class)->public();
 
         // --- HTTP client (optionally retry-wrapped) ---
-        $clientOptions = ['timeout' => $http['timeout'] ?? 10.0];
+        $clientOptions = [
+            'timeout' => $http['timeout'] ?? 10.0,
+            // Force TLS 1.3 by default: SofaScore's Cloudflare 403s older handshakes (TLS fingerprint).
+            'crypto_method' => \is_int($http['crypto_method'] ?? null) ? $http['crypto_method'] : \STREAM_CRYPTO_METHOD_TLSv1_3_CLIENT,
+        ];
         if (null !== ($http['proxy'] ?? null)) {
             $clientOptions['proxy'] = $http['proxy'];
         }
