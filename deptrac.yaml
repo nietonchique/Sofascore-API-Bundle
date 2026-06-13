@@ -1,0 +1,53 @@
+deptrac:
+  paths:
+    - ./src
+  layers:
+    - name: Exception
+      collectors:
+        - type: directory
+          value: src/Exception/.*
+    - name: Enum
+      collectors:
+        - type: directory
+          value: src/Enum/.*
+    - name: Dto
+      collectors:
+        - type: directory
+          value: src/Dto/.*
+    - name: Transport
+      collectors:
+        - type: directory
+          value: src/Transport/.*
+    - name: Endpoint
+      collectors:
+        - type: directory
+          value: src/Endpoint/.*
+    - name: Client
+      collectors:
+        - type: directory
+          value: src/SofascoreClient\.php
+    - name: Bundle
+      collectors:
+        - type: directory
+          value: src/SofascoreApiBundle\.php
+  ruleset:
+    Exception: ~
+    Enum:
+      - Exception
+    Dto: ~
+    Transport:
+      - Exception
+    Endpoint:
+      - Transport
+      - Exception
+      - Enum
+      - Dto
+    Client:
+      - Transport
+      - Endpoint
+      - Enum
+    Bundle:
+      - Transport
+      - Endpoint
+      - Enum
+      - Client

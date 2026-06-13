@@ -1,0 +1,76 @@
+{
+    "name": "nietonchique/sofascore-api-bundle",
+    "description": "Symfony bundle and standalone PHP client for the unofficial SofaScore API: matches, players, teams, tournaments and live per-sport statistics, with a pluggable HTTP / headless-Chrome transport.",
+    "type": "symfony-bundle",
+    "keywords": ["sofascore", "sports", "api", "football", "soccer", "symfony-bundle", "client"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aleksandr Ryzhkov",
+            "email": "ok.inferno@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.2",
+        "psr/cache": "^3.0",
+        "psr/log": "^3.0",
+        "symfony/config": "^7.1",
+        "symfony/dependency-injection": "^7.1",
+        "symfony/http-client": "^7.1",
+        "symfony/http-client-contracts": "^3.5",
+        "symfony/http-kernel": "^7.1"
+    },
+    "require-dev": {
+        "chrome-php/chrome": "^1.11",
+        "deptrac/deptrac": "*",
+        "friendsofphp/php-cs-fixer": "^3.64",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.1",
+        "phpstan/phpstan-phpunit": "^2.0",
+        "phpstan/phpstan-strict-rules": "^2.0",
+        "phpstan/phpstan-symfony": "^2.0",
+        "phpunit/phpunit": "^11.5",
+        "symfony/cache": "^7.1",
+        "symfony/framework-bundle": "^7.1",
+        "symfony/rate-limiter": "^7.1"
+    },
+    "suggest": {
+        "chrome-php/chrome": "Required for the headless-Chrome transport fallback (Cloudflare 403 bypass) — transport: chrome|chain",
+        "symfony/rate-limiter": "Required when the rate_limit transport decorator is enabled",
+        "symfony/cache": "Provides a PSR-6 pool for the cache transport decorator"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nietonchique\\SofascoreApiBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nietonchique\\SofascoreApiBundle\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "1.0-dev"
+        }
+    },
+    "scripts": {
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "php-cs-fixer fix",
+        "stan": "phpstan analyse",
+        "deptrac": "deptrac analyse --no-progress",
+        "test": "phpunit",
+        "qa": [
+            "@cs-check",
+            "@stan",
+            "@deptrac",
+            "@test"
+        ]
+    }
+}
