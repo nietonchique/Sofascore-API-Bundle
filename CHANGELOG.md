@@ -5,7 +5,7 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0] - 2026-06-13
 
 ### Added
 - Initial release: a Symfony bundle and standalone PHP client for the unofficial
@@ -24,4 +24,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Symfony bundle integration (`SofascoreApiBundle`) with autowired services and a
   configuration tree for the transport and decorators.
 
-[Unreleased]: https://github.com/nietonchique/Sofascore-API-Bundle
+[1.0.0]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.0
