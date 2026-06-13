@@ -10,3 +10,6 @@
 /.gitattributes         export-ignore
 /.editorconfig          export-ignore
 /CHANGELOG.md           export-ignore
+/Dockerfile             export-ignore
+/compose.yaml           export-ignore
+/Makefile               export-ignore

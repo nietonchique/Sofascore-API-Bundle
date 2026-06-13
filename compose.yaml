@@ -1,0 +1,12 @@
+# Dev-only: run the bundle's tests/QA in a container (PHP 8.5 by default).
+# Use the Makefile (`make test` / `make qa`) — it runs the container as your
+# host user so no root-owned files are left behind.
+services:
+  php:
+    build:
+      context: .
+      args:
+        PHP_VERSION: ${PHP:-8.5}
+    volumes:
+      - .:/app
+    working_dir: /app

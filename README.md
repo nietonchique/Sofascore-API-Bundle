@@ -14,8 +14,8 @@ entities, and full PHPStan (max) / Deptrac / PHPUnit coverage.
 
 ## Requirements
 
-- PHP **8.2+**
-- Symfony **7.1+** components (when used as a bundle)
+- PHP **8.4+**
+- Symfony **8.0+** components (when used as a bundle)
 - Optional: a Chromium/Chrome binary + [`chrome-php/chrome`](https://github.com/chrome-php/chrome)
   for the headless-browser transport (Cloudflare fallback)
 
@@ -213,6 +213,48 @@ current IP):
 ```bash
 vendor/bin/phpunit --group network
 ```
+
+## Development
+
+A bundle is a library — "developing" it means editing code and running the test
+suite (there is no app server to start). Use the host PHP (8.4+) directly:
+
+```bash
+composer install
+composer qa        # cs-fixer + phpstan + deptrac + phpunit
+```
+
+…or run everything in Docker (no PHP needed on the host; the container runs as
+your user, so it leaves no root-owned files):
+
+```bash
+make install       # PHP 8.5 by default — `make PHP=8.4 qa` to pick a version
+make qa
+make test
+```
+
+### Using the bundle in a Dockerized app
+
+The bundle is pure PHP; a minimal consumer image needs only PHP + ext-curl:
+
+```dockerfile
+FROM php:8.5-cli
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+WORKDIR /app
+COPY . .
+RUN composer install --no-dev --prefer-dist --no-progress
+```
+
+For the headless-Chrome fallback, also install a Chromium binary and the optional
+dependency (`composer require chrome-php/chrome`, then `chrome.binary: chromium`):
+
+```dockerfile
+RUN apt-get update && apt-get install -y --no-install-recommends chromium \
+ && rm -rf /var/lib/apt/lists/*
+```
+
+> On a server/cloud the container's IP is a datacenter IP that Cloudflare blocks —
+> route through a proxy (`http.proxy`) to a clean residential/mobile exit.
 
 ## Troubleshooting
 

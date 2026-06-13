@@ -5,6 +5,17 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-06-13
+
+### Changed
+- **BC break:** the bundle now requires **PHP 8.4+** and **Symfony 8.0+**
+  components, dropping support for PHP 8.2/8.3 and Symfony 7.x. It targets the
+  current stack only.
+
+### Removed
+- The CI "lowest dependencies" job (no legacy-version support). CI now runs on
+  PHP 8.4 and 8.5.
+
 ## [1.1.0] - 2026-06-13
 
 ### Added
@@ -73,6 +84,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Symfony bundle integration (`SofascoreApiBundle`) with autowired services and a
   configuration tree for the transport and decorators.
 
+[2.0.0]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v2.0.0
 [1.1.0]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.1.0
 [1.0.2]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.2
 [1.0.1]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.1
