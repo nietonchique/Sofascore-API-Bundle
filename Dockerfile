@@ -16,7 +16,8 @@ RUN apt-get update \
  && pecl install pcov \
  && docker-php-ext-enable pcov \
  && rm -rf /var/lib/apt/lists/* \
- && git config --global --add safe.directory '*'
+ && git config --global --add safe.directory '*' \
+ && echo 'memory_limit=-1' > /usr/local/etc/php/conf.d/memory-limit.ini
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
