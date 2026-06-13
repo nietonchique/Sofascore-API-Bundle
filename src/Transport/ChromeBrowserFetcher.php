@@ -40,17 +40,29 @@ final class ChromeBrowserFetcher implements BrowserFetcherInterface
         private readonly int $timeoutMs = 30_000,
         private readonly ?string $warmupUrl = 'https://www.sofascore.com/',
         private readonly string $userAgent = self::DEFAULT_USER_AGENT,
+        private readonly ?string $proxy = null,
     ) {
     }
 
+    /**
+     * Drives a real headless browser, so it is exercised by the live integration
+     * tests (group "network") rather than unit tests.
+     *
+     * @codeCoverageIgnore
+     */
     public function fetch(string $url): string
     {
+        $customFlags = ['--disable-blink-features=AutomationControlled', '--lang=en-US'];
+        if (null !== $this->proxy) {
+            $customFlags[] = '--proxy-server='.$this->proxy;
+        }
+
         $browser = (new BrowserFactory($this->binary))->createBrowser([
             'headless' => $this->headless,
             'noSandbox' => true,
             'windowSize' => [1366, 768],
             'userAgent' => $this->userAgent,
-            'customFlags' => ['--disable-blink-features=AutomationControlled', '--lang=en-US'],
+            'customFlags' => $customFlags,
         ]);
 
         try {

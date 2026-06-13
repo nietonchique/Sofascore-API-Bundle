@@ -75,29 +75,33 @@ final class SofascoreApiBundle extends AbstractBundle
                 ->end()
                 ->scalarNode('base_url')->defaultValue(HttpClientTransport::BASE_URL)->cannotBeEmpty()->end()
                 ->arrayNode('http')->addDefaultsIfNotSet()->children()
-                    ->floatNode('timeout')->defaultValue(10.0)->end()
+                    ->floatNode('timeout')->min(0.0)->defaultValue(10.0)->end()
                     ->scalarNode('proxy')->defaultNull()->end()
+                    ->scalarNode('user_agent')->info('Override the default browser User-Agent.')->defaultNull()->end()
+                    ->scalarNode('x_requested_with')->info('Value for the required X-Requested-With header (default: a random token).')->defaultNull()->end()
                     ->arrayNode('headers')->scalarPrototype()->end()->end()
                 ->end()->end()
                 ->arrayNode('chrome')->addDefaultsIfNotSet()->children()
-                    ->scalarNode('binary')->defaultValue('google-chrome-stable')->end()
+                    ->scalarNode('binary')->defaultValue('google-chrome-stable')->cannotBeEmpty()->end()
                     ->booleanNode('headless')->defaultTrue()->end()
-                    ->integerNode('timeout_ms')->defaultValue(30_000)->end()
+                    ->integerNode('timeout_ms')->min(0)->defaultValue(30_000)->end()
+                    ->scalarNode('warmup_url')->info('Page loaded before the API call to clear Cloudflare (null to disable).')->defaultValue('https://www.sofascore.com/')->end()
+                    ->scalarNode('proxy')->info('Proxy for Chrome, e.g. "socks5://127.0.0.1:1080".')->defaultNull()->end()
                 ->end()->end()
                 ->arrayNode('retry')->addDefaultsIfNotSet()->children()
                     ->booleanNode('enabled')->defaultFalse()->end()
-                    ->integerNode('max_retries')->defaultValue(3)->end()
-                    ->integerNode('delay_ms')->defaultValue(1_000)->end()
+                    ->integerNode('max_retries')->min(0)->defaultValue(3)->end()
+                    ->integerNode('delay_ms')->min(0)->defaultValue(1_000)->end()
                 ->end()->end()
                 ->arrayNode('cache')->addDefaultsIfNotSet()->children()
                     ->booleanNode('enabled')->defaultFalse()->end()
-                    ->scalarNode('pool')->defaultValue('cache.app')->end()
-                    ->integerNode('ttl')->defaultValue(300)->end()
+                    ->scalarNode('pool')->defaultValue('cache.app')->cannotBeEmpty()->end()
+                    ->integerNode('ttl')->min(0)->defaultValue(300)->end()
                 ->end()->end()
                 ->arrayNode('rate_limit')->addDefaultsIfNotSet()->children()
                     ->booleanNode('enabled')->defaultFalse()->end()
-                    ->integerNode('limit')->defaultValue(60)->end()
-                    ->scalarNode('interval')->defaultValue('1 minute')->end()
+                    ->integerNode('limit')->min(1)->defaultValue(60)->end()
+                    ->scalarNode('interval')->cannotBeEmpty()->defaultValue('1 minute')->end()
                 ->end()->end()
                 ->arrayNode('logging')->addDefaultsIfNotSet()->children()
                     ->booleanNode('enabled')->defaultFalse()->end()
@@ -124,6 +128,11 @@ final class SofascoreApiBundle extends AbstractBundle
         $logging = \is_array($config['logging'] ?? null) ? $config['logging'] : [];
         $baseUrl = $config['base_url'] ?? HttpClientTransport::BASE_URL;
         $headers = \is_array($http['headers'] ?? null) ? $http['headers'] : [];
+        $userAgent = \is_string($http['user_agent'] ?? null) ? $http['user_agent'] : null;
+        $requestedWith = \is_string($http['x_requested_with'] ?? null) ? $http['x_requested_with'] : null;
+        if (null !== $userAgent) {
+            $headers['User-Agent'] = $userAgent;
+        }
 
         $services->set(Enums::class)->public();
 
@@ -147,10 +156,17 @@ final class SofascoreApiBundle extends AbstractBundle
 
         // --- base transports ---
         $services->set($p.'.transport.http', HttpClientTransport::class)
-            ->args([service($clientId), $baseUrl, $headers]);
+            ->args([service($clientId), $baseUrl, $headers, $requestedWith]);
 
-        $services->set($p.'.chrome_fetcher', ChromeBrowserFetcher::class)
-            ->args([$chrome['binary'] ?? 'google-chrome-stable', $chrome['headless'] ?? true, $chrome['timeout_ms'] ?? 30000]);
+        $warmupUrl = \array_key_exists('warmup_url', $chrome) ? $chrome['warmup_url'] : 'https://www.sofascore.com/';
+        $chromeProxy = \is_string($chrome['proxy'] ?? null) ? $chrome['proxy'] : null;
+        $fetcher = $services->set($p.'.chrome_fetcher', ChromeBrowserFetcher::class)
+            ->args([$chrome['binary'] ?? 'google-chrome-stable', $chrome['headless'] ?? true, $chrome['timeout_ms'] ?? 30000])
+            ->arg('$warmupUrl', $warmupUrl)
+            ->arg('$proxy', $chromeProxy);
+        if (null !== $userAgent) {
+            $fetcher->arg('$userAgent', $userAgent);
+        }
         $services->set($p.'.transport.chrome', ChromeTransport::class)
             ->args([service($p.'.chrome_fetcher'), $baseUrl]);
 

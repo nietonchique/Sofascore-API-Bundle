@@ -4,14 +4,29 @@ declare(strict_types=1);
 
 namespace Nietonchique\SofascoreApiBundle\Tests\DependencyInjection;
 
+use Nietonchique\SofascoreApiBundle\Endpoint\AmericanFootball;
+use Nietonchique\SofascoreApiBundle\Endpoint\Baseball;
 use Nietonchique\SofascoreApiBundle\Endpoint\Basketball;
+use Nietonchique\SofascoreApiBundle\Endpoint\Cricket;
+use Nietonchique\SofascoreApiBundle\Endpoint\Esports;
+use Nietonchique\SofascoreApiBundle\Endpoint\IceHockey;
+use Nietonchique\SofascoreApiBundle\Endpoint\Mma;
+use Nietonchique\SofascoreApiBundle\Endpoint\Motorsport;
+use Nietonchique\SofascoreApiBundle\Endpoint\News;
+use Nietonchique\SofascoreApiBundle\Endpoint\Rugby;
+use Nietonchique\SofascoreApiBundle\Endpoint\Tennis;
+use Nietonchique\SofascoreApiBundle\Endpoint\Transfers;
+use Nietonchique\SofascoreApiBundle\Endpoint\UserData;
 use Nietonchique\SofascoreApiBundle\Enum\Enums;
 use Nietonchique\SofascoreApiBundle\SofascoreClient;
 use Nietonchique\SofascoreApiBundle\Transport\ChainTransport;
+use Nietonchique\SofascoreApiBundle\Transport\ChromeTransport;
 use Nietonchique\SofascoreApiBundle\Transport\Decorator\LoggingTransport;
 use Nietonchique\SofascoreApiBundle\Transport\HttpClientTransport;
 use Nietonchique\SofascoreApiBundle\Transport\TransportInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Filesystem\Filesystem;
 
 final class BundleIntegrationTest extends TestCase
@@ -61,6 +76,67 @@ final class BundleIntegrationTest extends TestCase
             \Nietonchique\SofascoreApiBundle\Transport\Decorator\CachingTransport::class,
             $container->get(TransportInterface::class),
         );
+    }
+
+    /**
+     * @return iterable<string, array{class-string}>
+     */
+    public static function autowiredEndpoints(): iterable
+    {
+        yield 'transfers' => [Transfers::class];
+        yield 'news' => [News::class];
+        yield 'user-data' => [UserData::class];
+        yield 'american-football' => [AmericanFootball::class];
+        yield 'baseball' => [Baseball::class];
+        yield 'cricket' => [Cricket::class];
+        yield 'esports' => [Esports::class];
+        yield 'ice-hockey' => [IceHockey::class];
+        yield 'mma' => [Mma::class];
+        yield 'motorsport' => [Motorsport::class];
+        yield 'rugby' => [Rugby::class];
+        yield 'tennis' => [Tennis::class];
+    }
+
+    /**
+     * @param class-string $class
+     */
+    #[DataProvider('autowiredEndpoints')]
+    public function testEveryNoArgEndpointIsAutowired(string $class): void
+    {
+        self::assertInstanceOf($class, $this->boot()->get($class));
+    }
+
+    public function testChromeProxyConfigCompiles(): void
+    {
+        $container = $this->boot([
+            'transport' => 'chrome',
+            'chrome' => ['proxy' => 'socks5://127.0.0.1:1080', 'warmup_url' => null],
+        ]);
+
+        self::assertInstanceOf(ChromeTransport::class, $container->get(TransportInterface::class));
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function invalidConfigs(): iterable
+    {
+        yield 'negative timeout' => [['http' => ['timeout' => -1.0]]];
+        yield 'negative ttl' => [['cache' => ['ttl' => -5]]];
+        yield 'negative max_retries' => [['retry' => ['max_retries' => -1]]];
+        yield 'zero rate limit' => [['rate_limit' => ['limit' => 0]]];
+        yield 'unknown transport' => [['transport' => 'carrier-pigeon']];
+        yield 'empty base_url' => [['base_url' => '']];
+    }
+
+    /**
+     * @param array<string, mixed> $config
+     */
+    #[DataProvider('invalidConfigs')]
+    public function testInvalidConfigurationIsRejected(array $config): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->boot($config);
     }
 
     /**

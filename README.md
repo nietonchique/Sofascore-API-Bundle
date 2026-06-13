@@ -102,6 +102,33 @@ the return style is intentionally hybrid and predictable:
 - **Every other method** returns a decoded `array` (the raw JSON), exactly as the
   Python library does.
 
+## Error handling
+
+Every exception thrown by the bundle implements `SofascoreExceptionInterface`:
+
+| Exception | Thrown when |
+|---|---|
+| `ApiException` | any non-2xx / undecodable response — base class, exposes `getStatusCode()` and `getUrl()` |
+| `ApiBlockedException` (extends `ApiException`) | HTTP 403 (Cloudflare); triggers the chain fallback |
+| `NotFoundException` (extends `ApiException`) | HTTP 404 (unknown entity) |
+| `InvalidArgumentException` | invalid argument, e.g. an unknown sport slug |
+
+```php
+use Nietonchique\SofascoreApiBundle\Exception\ApiBlockedException;
+use Nietonchique\SofascoreApiBundle\Exception\NotFoundException;
+use Nietonchique\SofascoreApiBundle\Exception\SofascoreExceptionInterface;
+
+try {
+    $event = $client->match(12436870)->getMatch();
+} catch (NotFoundException) {
+    // no such match
+} catch (ApiBlockedException $e) {
+    // Cloudflare blocked this IP — configure a proxy (see below)
+} catch (SofascoreExceptionInterface $e) {
+    // any other error from the bundle: $e->getMessage()
+}
+```
+
 ## Transports & Cloudflare (403)
 
 SofaScore sits behind Cloudflare. The bundle ships three transports behind a
@@ -143,11 +170,16 @@ sofascore_api:
     transport: chain          # http | chrome | chain
     http:
         timeout: 10.0
-        proxy: null
+        proxy: null                       # 'socks5h://127.0.0.1:1080'
+        user_agent: null                  # override the default browser UA
+        x_requested_with: null            # override the required header (default: random token)
+        headers: {}                       # any extra headers
     chrome:
         binary: google-chrome-stable
         headless: true
         timeout_ms: 30000
+        warmup_url: 'https://www.sofascore.com/'  # null to disable
+        proxy: null                       # 'socks5://127.0.0.1:1080'
     retry:
         enabled: false
         max_retries: 3
@@ -181,6 +213,24 @@ current IP):
 ```bash
 vendor/bin/phpunit --group network
 ```
+
+## Troubleshooting
+
+- **Every request throws `ApiBlockedException` (403).** Two independent causes:
+  1. the `X-Requested-With` header is missing — it is sent automatically, so this
+     only happens if you overrode `http.headers` and dropped it;
+  2. the exit IP is geo/reputation-blocked (e.g. Russia, some datacenter ranges).
+     Set `http.proxy` (and `chrome.proxy`) to a clean exit.
+- **`transport: chrome` fails with "class not found".** Install the optional
+  dependency and make sure a Chromium binary is available:
+  `composer require chrome-php/chrome` and set `chrome.binary`.
+- **`rate_limit` / `cache` enabled but the container errors.** Install
+  `symfony/rate-limiter`, and point `cache.pool` at a PSR-6 pool (`cache.app`
+  ships with FrameworkBundle).
+- **Headless Chrome still gets 403.** SofaScore's Cloudflare challenge is hard for
+  headless automation; use the `http` transport with a clean residential/mobile
+  proxy instead — it only needs the `X-Requested-With` header, which is sent
+  for you.
 
 ## Credits
 

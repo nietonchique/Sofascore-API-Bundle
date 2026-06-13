@@ -5,6 +5,26 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-06-13
+
+### Added
+- Chrome transport proxy support (`chrome.proxy`) and configurable warm-up URL
+  (`chrome.warmup_url`), so the headless-Chrome fallback can use the same exit
+  as the HTTP transport.
+- New transport config options `http.user_agent` and `http.x_requested_with`.
+- Configuration validation: value ranges (`http.timeout` ≥ 0, `cache.ttl` ≥ 0,
+  `retry.*` ≥ 0, `rate_limit.limit` ≥ 1) and non-empty `base_url` / `chrome.binary`
+  / `cache.pool` / `rate_limit.interval`.
+- More tests: reflection coverage that every `SofascoreClient` factory returns an
+  endpoint, every no-arg endpoint resolves from the container, invalid-config
+  rejection, and chrome-proxy wiring.
+
+### Changed
+- CI: added a lowest-dependencies job (PHP 8.2 / Symfony 7.1 floor) and a coverage
+  job enforcing an 80% line-coverage threshold.
+- Documentation: new Error-handling and Troubleshooting sections; transport and
+  configuration reference expanded.
+
 ## [1.0.2] - 2026-06-13
 
 ### Fixed
@@ -53,6 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Symfony bundle integration (`SofascoreApiBundle`) with autowired services and a
   configuration tree for the transport and decorators.
 
+[1.1.0]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.1.0
 [1.0.2]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.2
 [1.0.1]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.1
 [1.0.0]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.0

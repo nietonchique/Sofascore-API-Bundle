@@ -47,3 +47,60 @@ jobs:
 
       - name: Tests (PHPUnit)
         run: vendor/bin/phpunit
+
+  lowest:
+    name: Lowest dependencies (PHP 8.2)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+
+      - name: Install lowest dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: lowest
+
+      - name: Static analysis (PHPStan)
+        run: vendor/bin/phpstan analyse --no-progress
+
+      - name: Tests (PHPUnit)
+        run: vendor/bin/phpunit
+
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: pcov
+          tools: composer:v2
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+
+      - name: Tests with coverage
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: Enforce coverage threshold (>= 80%)
+        run: |
+          php -r '
+            $xml = simplexml_load_file("coverage.xml");
+            $m = $xml->project->metrics;
+            $total = (int) $m["statements"];
+            $covered = (int) $m["coveredstatements"];
+            $pct = $total > 0 ? 100 * $covered / $total : 0;
+            printf("Line coverage: %.2f%% (%d/%d)\n", $pct, $covered, $total);
+            if ($pct < 80.0) { fwrite(STDERR, "Coverage below 80% threshold\n"); exit(1); }
+          '
