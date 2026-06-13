@@ -59,9 +59,11 @@ final class HttpClientTransportTest extends TestCase
 
         $transport->get('/x');
 
-        $joined = implode("\n", $captured);
+        $joined = strtolower(implode("\n", $captured));
         self::assertStringContainsString('sofascore.com', $joined);
-        self::assertStringContainsString('Mozilla/5.0', $joined);
+        self::assertStringContainsString('mozilla/5.0', $joined);
+        // SofaScore gates its API on this header being present.
+        self::assertStringContainsString('x-requested-with', $joined);
     }
 
     public function test403ThrowsApiBlocked(): void

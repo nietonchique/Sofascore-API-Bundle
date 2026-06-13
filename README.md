@@ -114,11 +114,24 @@ single `TransportInterface`:
   Cloudflare clearance cookie before calling the API.
 - **`chain`** (default) — tries HTTP first and falls back to Chrome on a 403.
 
-> **Note.** Datacenter / flagged IPs are frequently answered with a Cloudflare
-> `403 "challenge"` for **both** transports. A residential IP (and/or a real
-> browser profile or an upstream proxy) is usually required to reach the API.
-> When blocked, the transport raises `ApiBlockedException` rather than returning
-> bogus data.
+> **The `X-Requested-With` header is required.** SofaScore answers every API
+> request that lacks it with a Cloudflare `403 "challenge"`. `HttpClientTransport`
+> sends it automatically (the value is not validated — a random per-instance hex
+> token is used to mimic the site's own XHR token), so the default `http`
+> transport reaches the API directly, no browser needed.
+>
+> **Some IPs are geo/reputation-blocked** (e.g. requests originating from Russia,
+> or certain datacenter ranges) and get a `403` regardless of headers. Route
+> through a clean exit with the `http.proxy` option — any SOCKS5/HTTP proxy works:
+>
+> ```yaml
+> sofascore_api:
+>     http:
+>         proxy: 'socks5h://127.0.0.1:1080'
+> ```
+>
+> When still blocked, the transport raises `ApiBlockedException` rather than
+> returning bogus data, and `ChainTransport` falls back to the Chrome transport.
 
 ### Configuration (bundle)
 

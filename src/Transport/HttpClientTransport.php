@@ -24,7 +24,7 @@ final class HttpClientTransport implements TransportInterface
      * @var array<string, string>
      */
     private const DEFAULT_HEADERS = [
-        'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/148.0.0.0 Safari/537.36',
         'Accept' => 'application/json, text/plain, */*',
         'Accept-Language' => 'en-US,en;q=0.9',
         'Referer' => 'https://www.sofascore.com/',
@@ -33,13 +33,23 @@ final class HttpClientTransport implements TransportInterface
     ];
 
     /**
+     * Value for the {@code X-Requested-With} header that SofaScore's API requires
+     * to be present (the value itself is not validated — verified empirically).
+     * A short random hex token is used to look like a browser's XHR token rather
+     * than to advertise this client.
+     */
+    private readonly string $requestedWith;
+
+    /**
      * @param array<string, string> $headers extra headers merged over the browser defaults
      */
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly string $baseUrl = self::BASE_URL,
         private readonly array $headers = [],
+        ?string $requestedWith = null,
     ) {
+        $this->requestedWith = $requestedWith ?? bin2hex(random_bytes(3));
     }
 
     public function get(string $endpoint, array $query = []): array
@@ -62,7 +72,7 @@ final class HttpClientTransport implements TransportInterface
         try {
             $response = $this->httpClient->request('GET', $url, [
                 'query' => $query,
-                'headers' => [...self::DEFAULT_HEADERS, ...$this->headers],
+                'headers' => [...self::DEFAULT_HEADERS, 'X-Requested-With' => $this->requestedWith, ...$this->headers],
             ]);
             $status = $response->getStatusCode();
         } catch (HttpClientExceptionInterface $e) {
