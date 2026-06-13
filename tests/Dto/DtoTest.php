@@ -56,31 +56,39 @@ final class DtoTest extends TestCase
             'id' => 7,
             'name' => 'Bukayo Saka',
             'position' => 'F',
-            'jerseyNumber' => 7,
+            'jerseyNumber' => '7',
+            'shirtNumber' => 7,
+            'height' => 178,
             'country' => ['alpha2' => 'EN'],
             'team' => ['id' => 42, 'name' => 'Arsenal'],
         ]);
 
         self::assertSame(7, $player->id);
         self::assertSame('F', $player->position);
-        self::assertSame(7, $player->jerseyNumber);
+        // jerseyNumber is a string in the API; shirtNumber is the int.
+        self::assertSame('7', $player->jerseyNumber);
+        self::assertSame(7, $player->shirtNumber);
+        self::assertSame(178, $player->height);
         self::assertSame('Arsenal', $player->team?->name);
         self::assertSame('EN', $player->country?->alpha2);
     }
 
-    public function testTournamentReadsCategoryAsCountry(): void
+    public function testTournamentResolvesSportFromCategory(): void
     {
         $t = Tournament::fromArray([
             'id' => 17,
             'name' => 'Premier League',
             'slug' => 'premier-league',
-            'sport' => ['id' => 1, 'slug' => 'football'],
-            'category' => ['name' => 'England', 'alpha2' => 'EN'],
+            // No top-level "sport": it lives under category.sport.
+            'category' => ['name' => 'England', 'alpha2' => 'EN', 'sport' => ['id' => 1, 'slug' => 'football']],
         ]);
 
         self::assertSame(17, $t->id);
         self::assertSame('football', $t->sport?->slug);
-        self::assertSame('England', $t->category?->name);
+        $category = $t->category;
+        self::assertNotNull($category);
+        self::assertSame('England', $category->name);
+        self::assertSame('EN', $category->alpha2);
     }
 
     public function testEventParsesTeamsAndScores(): void

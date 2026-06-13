@@ -37,7 +37,10 @@ final class Player extends AbstractEndpoint
      */
     public function getPlayer(): PlayerDto
     {
-        return PlayerDto::fromArray($this->get("/player/{$this->playerId}"));
+        $data = $this->get("/player/{$this->playerId}");
+        $player = $data['player'] ?? null;
+
+        return PlayerDto::fromArray(\is_array($player) ? $player : $data);
     }
 
     /**

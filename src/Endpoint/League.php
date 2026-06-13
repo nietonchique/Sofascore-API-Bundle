@@ -33,7 +33,10 @@ final class League extends AbstractEndpoint
      */
     public function getLeague(): Tournament
     {
-        return Tournament::fromArray($this->get("/unique-tournament/{$this->leagueId}"));
+        $data = $this->get("/unique-tournament/{$this->leagueId}");
+        $tournament = $data['uniqueTournament'] ?? null;
+
+        return Tournament::fromArray(\is_array($tournament) ? $tournament : $data);
     }
 
     /**

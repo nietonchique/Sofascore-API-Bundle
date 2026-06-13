@@ -5,6 +5,26 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-06-13
+
+### Fixed
+- `getPlayer()` and `getLeague()` now unwrap the `player` / `uniqueTournament`
+  envelope before building the DTO — previously they produced all-null DTOs.
+- `Tournament::$sport` is resolved from `category.sport` (SofaScore exposes no
+  top-level sport on a unique tournament) — it was always `null` before.
+- `Player::$jerseyNumber` is now `?string` (the API sends a string such as `"7"`);
+  the integer is available as the new `shirtNumber`.
+
+### Added
+- Entity DTOs expanded with stably-present fields, verified against real API
+  responses: Team (`fullName`, `gender`, `type`, `disabled`, `category`,
+  `teamColors`), Player (`shirtNumber`, `height`, `dateOfBirth` + `Timestamp`,
+  `gender`, `contractUntilTimestamp`, `deceased`), Tournament (`gender`,
+  `primaryColorHex`, `secondaryColorHex`, `category`), Event (`statusCode`,
+  `statusDescription`, `customId`).
+- New `Category` and `TeamColors` DTOs.
+- Real-response DTO validation tests backed by frozen fixtures (`tests/fixtures/dto/`).
+
 ## [1.0.1] - 2026-06-13
 
 ### Fixed
@@ -33,5 +53,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Symfony bundle integration (`SofascoreApiBundle`) with autowired services and a
   configuration tree for the transport and decorators.
 
+[1.0.2]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.2
 [1.0.1]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.1
 [1.0.0]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.0

@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Nietonchique\SofascoreApiBundle\Dto;
 
 /**
- * A SofaScore player. Common fields are typed; the complete payload remains
- * available via {@see Player::$raw} / {@see Player::toArray()}.
+ * A SofaScore player. Common, stably-present fields are typed; the complete
+ * payload remains available via {@see Player::$raw} / {@see Player::toArray()}.
  */
 final readonly class Player
 {
@@ -19,7 +19,14 @@ final readonly class Player
         public ?string $shortName,
         public ?string $slug,
         public ?string $position,
-        public ?int $jerseyNumber,
+        public ?string $jerseyNumber,
+        public ?int $shirtNumber,
+        public ?int $height,
+        public ?string $dateOfBirth,
+        public ?int $dateOfBirthTimestamp,
+        public ?int $contractUntilTimestamp,
+        public ?string $gender,
+        public bool $deceased,
         public ?int $userCount,
         public ?Country $country,
         public ?Team $team,
@@ -41,7 +48,15 @@ final readonly class Player
             Cast::string($data['shortName'] ?? null),
             Cast::string($data['slug'] ?? null),
             Cast::string($data['position'] ?? null),
-            Cast::int($data['jerseyNumber'] ?? null),
+            // SofaScore sends jerseyNumber as a string (e.g. "7"); shirtNumber is the int.
+            Cast::string($data['jerseyNumber'] ?? null),
+            Cast::int($data['shirtNumber'] ?? null),
+            Cast::int($data['height'] ?? null),
+            Cast::string($data['dateOfBirth'] ?? null),
+            Cast::int($data['dateOfBirthTimestamp'] ?? null),
+            Cast::int($data['contractUntilTimestamp'] ?? null),
+            Cast::string($data['gender'] ?? null),
+            Cast::bool($data['deceased'] ?? false),
             Cast::int($data['userCount'] ?? null),
             null !== $country ? Country::fromArray($country) : null,
             null !== $team ? Team::fromArray($team) : null,

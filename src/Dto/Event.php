@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Nietonchique\SofascoreApiBundle\Dto;
 
 /**
- * A SofaScore event (a match). Common fields are typed; the complete payload
- * remains available via {@see Event::$raw} / {@see Event::toArray()}.
+ * A SofaScore event (a match). Common, stably-present fields are typed; the
+ * complete payload remains available via {@see Event::$raw} / {@see Event::toArray()}.
  */
 final readonly class Event
 {
@@ -16,8 +16,11 @@ final readonly class Event
     public function __construct(
         public ?int $id,
         public ?string $slug,
+        public ?string $customId,
         public ?int $startTimestamp,
         public ?string $statusType,
+        public ?int $statusCode,
+        public ?string $statusDescription,
         public ?int $winnerCode,
         public ?Tournament $tournament,
         public ?Team $homeTeam,
@@ -49,8 +52,11 @@ final readonly class Event
         return new self(
             Cast::int($data['id'] ?? null),
             Cast::string($data['slug'] ?? null),
+            Cast::string($data['customId'] ?? null),
             Cast::int($data['startTimestamp'] ?? null),
             Cast::string($status['type'] ?? null),
+            Cast::int($status['code'] ?? null),
+            Cast::string($status['description'] ?? null),
             Cast::int($data['winnerCode'] ?? null),
             null !== $tournament ? Tournament::fromArray($tournament) : null,
             null !== $homeTeam ? Team::fromArray($homeTeam) : null,
