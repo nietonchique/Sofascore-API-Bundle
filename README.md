@@ -1,5 +1,12 @@
 # SofaScore API Bundle
 
+[![CI](https://github.com/nietonchique/Sofascore-API-Bundle/actions/workflows/ci.yml/badge.svg)](https://github.com/nietonchique/Sofascore-API-Bundle/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/nietonchique/Sofascore-API-Bundle/branch/master/graph/badge.svg)](https://codecov.io/gh/nietonchique/Sofascore-API-Bundle)
+[![Latest Version](https://img.shields.io/packagist/v/nietonchique/sofascore-api-bundle.svg)](https://packagist.org/packages/nietonchique/sofascore-api-bundle)
+![PHP](https://img.shields.io/badge/PHP-8.4%2B-777bb4?logo=php&logoColor=white)
+![Symfony](https://img.shields.io/badge/Symfony-8-000000?logo=symfony&logoColor=white)
+[![License](https://img.shields.io/packagist/l/nietonchique/sofascore-api-bundle.svg)](LICENSE)
+
 A Symfony bundle **and** standalone PHP client for the (unofficial) [SofaScore](https://www.sofascore.com)
 API — matches, players, teams, tournaments and live per-sport statistics.
 
