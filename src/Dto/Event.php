@@ -27,6 +27,7 @@ final readonly class Event
         public ?Team $awayTeam,
         public ?Score $homeScore,
         public ?Score $awayScore,
+        public ?FieldTranslations $fieldTranslations = null,
         public array $raw = [],
     ) {
     }
@@ -48,22 +49,24 @@ final readonly class Event
         $awayTeam = Cast::array($data['awayTeam'] ?? null);
         $homeScore = Cast::array($data['homeScore'] ?? null);
         $awayScore = Cast::array($data['awayScore'] ?? null);
+        $fieldTranslations = Cast::array($data['fieldTranslations'] ?? null);
 
         return new self(
-            Cast::int($data['id'] ?? null),
-            Cast::string($data['slug'] ?? null),
-            Cast::string($data['customId'] ?? null),
-            Cast::int($data['startTimestamp'] ?? null),
-            Cast::string($status['type'] ?? null),
-            Cast::int($status['code'] ?? null),
-            Cast::string($status['description'] ?? null),
-            Cast::int($data['winnerCode'] ?? null),
-            null !== $tournament ? Tournament::fromArray($tournament) : null,
-            null !== $homeTeam ? Team::fromArray($homeTeam) : null,
-            null !== $awayTeam ? Team::fromArray($awayTeam) : null,
-            null !== $homeScore ? Score::fromArray($homeScore) : null,
-            null !== $awayScore ? Score::fromArray($awayScore) : null,
-            $data,
+            id: Cast::int($data['id'] ?? null),
+            slug: Cast::string($data['slug'] ?? null),
+            customId: Cast::string($data['customId'] ?? null),
+            startTimestamp: Cast::int($data['startTimestamp'] ?? null),
+            statusType: Cast::string($status['type'] ?? null),
+            statusCode: Cast::int($status['code'] ?? null),
+            statusDescription: Cast::string($status['description'] ?? null),
+            winnerCode: Cast::int($data['winnerCode'] ?? null),
+            tournament: null !== $tournament ? Tournament::fromArray($tournament) : null,
+            homeTeam: null !== $homeTeam ? Team::fromArray($homeTeam) : null,
+            awayTeam: null !== $awayTeam ? Team::fromArray($awayTeam) : null,
+            homeScore: null !== $homeScore ? Score::fromArray($homeScore) : null,
+            awayScore: null !== $awayScore ? Score::fromArray($awayScore) : null,
+            fieldTranslations: null !== $fieldTranslations ? FieldTranslations::fromArray($fieldTranslations) : null,
+            raw: $data,
         );
     }
 

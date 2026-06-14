@@ -6,6 +6,8 @@ namespace Nietonchique\SofascoreApiBundle\Tests\Dto;
 
 use Nietonchique\SofascoreApiBundle\Dto\Country;
 use Nietonchique\SofascoreApiBundle\Dto\Event;
+use Nietonchique\SofascoreApiBundle\Dto\FieldTranslations;
+use Nietonchique\SofascoreApiBundle\Dto\LanguageCode;
 use Nietonchique\SofascoreApiBundle\Dto\Player;
 use Nietonchique\SofascoreApiBundle\Dto\Score;
 use Nietonchique\SofascoreApiBundle\Dto\Sport;
@@ -50,6 +52,22 @@ final class DtoTest extends TestCase
         self::assertSame($raw, Team::fromArray($raw)->toArray());
     }
 
+    public function testTeamParsesFieldTranslations(): void
+    {
+        $team = Team::fromArray([
+            'id' => 42,
+            'name' => 'Arsenal',
+            'fieldTranslations' => [
+                'nameTranslation' => ['ru' => 'Арсенал', 'sr' => 'Арсенал'],
+                'shortNameTranslation' => ['ru' => 'АРС'],
+            ],
+        ]);
+
+        self::assertInstanceOf(FieldTranslations::class, $team->fieldTranslations);
+        self::assertSame('Арсенал', $team->fieldTranslations->nameIn(LanguageCode::RU));
+        self::assertSame('АРС', $team->fieldTranslations->shortNameIn(LanguageCode::RU));
+    }
+
     public function testPlayerParsesTeamAndCountry(): void
     {
         $player = Player::fromArray([
@@ -73,6 +91,20 @@ final class DtoTest extends TestCase
         self::assertSame('EN', $player->country?->alpha2);
     }
 
+    public function testPlayerParsesFieldTranslations(): void
+    {
+        $player = Player::fromArray([
+            'id' => 7,
+            'name' => 'Bukayo Saka',
+            'fieldTranslations' => [
+                'nameTranslation' => ['ru' => 'Букайо Сака'],
+            ],
+        ]);
+
+        self::assertInstanceOf(FieldTranslations::class, $player->fieldTranslations);
+        self::assertSame('Букайо Сака', $player->fieldTranslations->nameIn(LanguageCode::RU));
+    }
+
     public function testTournamentResolvesSportFromCategory(): void
     {
         $t = Tournament::fromArray([
@@ -89,6 +121,34 @@ final class DtoTest extends TestCase
         self::assertNotNull($category);
         self::assertSame('England', $category->name);
         self::assertSame('EN', $category->alpha2);
+    }
+
+    public function testTournamentParsesFieldTranslations(): void
+    {
+        $tournament = Tournament::fromArray([
+            'id' => 17,
+            'name' => 'Premier League',
+            'fieldTranslations' => [
+                'nameTranslation' => ['ru' => 'Премьер-лига'],
+            ],
+        ]);
+
+        self::assertInstanceOf(FieldTranslations::class, $tournament->fieldTranslations);
+        self::assertSame('Премьер-лига', $tournament->fieldTranslations->nameIn(LanguageCode::RU));
+    }
+
+    public function testCategoryParsesFieldTranslations(): void
+    {
+        $category = \Nietonchique\SofascoreApiBundle\Dto\Category::fromArray([
+            'id' => 1,
+            'name' => 'England',
+            'fieldTranslations' => [
+                'nameTranslation' => ['ru' => 'Англия'],
+            ],
+        ]);
+
+        self::assertInstanceOf(FieldTranslations::class, $category->fieldTranslations);
+        self::assertSame('Англия', $category->fieldTranslations->nameIn(LanguageCode::RU));
     }
 
     public function testEventParsesTeamsAndScores(): void
@@ -111,6 +171,19 @@ final class DtoTest extends TestCase
         self::assertSame('Arsenal', $event->homeTeam?->name);
         self::assertSame(2, $event->homeScore?->current);
         self::assertSame(1, $event->awayScore?->current);
+    }
+
+    public function testEventParsesFieldTranslations(): void
+    {
+        $event = Event::fromArray([
+            'id' => 12345,
+            'fieldTranslations' => [
+                'nameTranslation' => ['ru' => 'Арсенал — Челси'],
+            ],
+        ]);
+
+        self::assertInstanceOf(FieldTranslations::class, $event->fieldTranslations);
+        self::assertSame('Арсенал — Челси', $event->fieldTranslations->nameIn(LanguageCode::RU));
     }
 
     public function testEventUnwrapsEventKey(): void

@@ -109,6 +109,32 @@ the return style is intentionally hybrid and predictable:
 - **Every other method** returns a decoded `array` (the raw JSON), exactly as the
   Python library does.
 
+## Translations
+
+Many SofaScore entities ship an embedded `fieldTranslations` dictionary. The typed
+DTOs expose it as a `?FieldTranslations` object:
+
+```php
+$event = $client->match(12436870)->getMatch();
+$team  = $event->homeTeam;
+
+// Full translation maps
+$team?->fieldTranslations?->name;       // ['ru' => 'Интер', 'sr' => 'Интер', ...]
+$team?->fieldTranslations?->shortName;  // ['ru' => 'Инт', ...]
+
+// Convenience accessor
+$team?->fieldTranslations?->nameIn(LanguageCode::RU);        // 'Интер'
+$team?->fieldTranslations?->nameIn(LanguageCode::SR);        // 'Интер'
+$team?->fieldTranslations?->nameIn('xx', 'fallback');        // 'fallback'
+```
+
+`LanguageCode` is a convenience catalogue of known SofaScore locale codes
+(including the base set `en`, `ru`, `sr` and the codes observed in real responses).
+You can still pass any arbitrary string to `nameIn()` / `shortNameIn()`.
+
+For methods that return raw arrays (e.g. `match()->gamesByDate()`), the
+`fieldTranslations` key is preserved in the response unchanged.
+
 ## Error handling
 
 Every exception thrown by the bundle implements `SofascoreExceptionInterface`:

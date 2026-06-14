@@ -27,6 +27,7 @@ final readonly class Tournament
         public ?string $secondaryColorHex,
         public ?Category $category,
         public ?Sport $sport,
+        public ?FieldTranslations $fieldTranslations = null,
         public array $raw = [],
     ) {
     }
@@ -41,18 +42,20 @@ final readonly class Tournament
         if (null === $sport && null !== $category) {
             $sport = Cast::array($category['sport'] ?? null);
         }
+        $fieldTranslations = Cast::array($data['fieldTranslations'] ?? null);
 
         return new self(
-            Cast::int($data['id'] ?? null),
-            Cast::string($data['name'] ?? null),
-            Cast::string($data['slug'] ?? null),
-            Cast::string($data['gender'] ?? null),
-            Cast::int($data['userCount'] ?? null),
-            Cast::string($data['primaryColorHex'] ?? null),
-            Cast::string($data['secondaryColorHex'] ?? null),
-            null !== $category ? Category::fromArray($category) : null,
-            null !== $sport ? Sport::fromArray($sport) : null,
-            $data,
+            id: Cast::int($data['id'] ?? null),
+            name: Cast::string($data['name'] ?? null),
+            slug: Cast::string($data['slug'] ?? null),
+            gender: Cast::string($data['gender'] ?? null),
+            userCount: Cast::int($data['userCount'] ?? null),
+            primaryColorHex: Cast::string($data['primaryColorHex'] ?? null),
+            secondaryColorHex: Cast::string($data['secondaryColorHex'] ?? null),
+            category: null !== $category ? Category::fromArray($category) : null,
+            sport: null !== $sport ? Sport::fromArray($sport) : null,
+            fieldTranslations: null !== $fieldTranslations ? FieldTranslations::fromArray($fieldTranslations) : null,
+            raw: $data,
         );
     }
 
