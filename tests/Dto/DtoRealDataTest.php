@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Nietonchique\SofascoreApiBundle\Tests\Dto;
 
+use Nietonchique\SofascoreApiBundle\Dto\FieldTranslations;
+use Nietonchique\SofascoreApiBundle\Dto\LanguageCode;
 use Nietonchique\SofascoreApiBundle\Endpoint\League;
 use Nietonchique\SofascoreApiBundle\Endpoint\MatchEndpoint;
 use Nietonchique\SofascoreApiBundle\Endpoint\Player;
@@ -51,6 +53,8 @@ final class DtoRealDataTest extends TestCase
         self::assertSame('EN', $team->country?->alpha2);
         self::assertSame('#cc0000', $team->teamColors?->primary);
         self::assertSame('England', $team->category?->name);
+        self::assertInstanceOf(FieldTranslations::class, $team->fieldTranslations);
+        self::assertSame('Арсенал', $team->fieldTranslations->nameIn(LanguageCode::RU));
     }
 
     public function testPlayerFromRealResponse(): void
@@ -67,6 +71,9 @@ final class DtoRealDataTest extends TestCase
         self::assertIsInt($player->dateOfBirthTimestamp);
         self::assertSame('AR', $player->country?->alpha2);
         self::assertSame('Inter Miami CF', $player->team?->name);
+        self::assertInstanceOf(FieldTranslations::class, $player->fieldTranslations);
+        self::assertSame('Лионель Месси', $player->fieldTranslations->nameIn(LanguageCode::RU));
+        self::assertSame('Л. Месси', $player->fieldTranslations->shortNameIn(LanguageCode::RU));
     }
 
     public function testTournamentFromRealResponse(): void
@@ -80,6 +87,10 @@ final class DtoRealDataTest extends TestCase
         self::assertSame('football', $tournament->sport?->slug);
         self::assertSame('England', $tournament->category?->name);
         self::assertSame('#3c1c5a', $tournament->primaryColorHex);
+        self::assertInstanceOf(FieldTranslations::class, $tournament->fieldTranslations);
+        self::assertSame('الدوري الإنجليزي الممتاز', $tournament->fieldTranslations->nameIn(LanguageCode::AR));
+        self::assertInstanceOf(FieldTranslations::class, $tournament->category->fieldTranslations);
+        self::assertSame('Англия', $tournament->category->fieldTranslations->nameIn(LanguageCode::RU));
     }
 
     public function testEventFromRealResponse(): void
@@ -96,5 +107,7 @@ final class DtoRealDataTest extends TestCase
         // finished match → populated scores.
         self::assertSame(1, $event->homeScore?->current);
         self::assertNotNull($event->awayScore);
+        self::assertInstanceOf(FieldTranslations::class, $event->homeTeam->fieldTranslations);
+        self::assertSame('Интер', $event->homeTeam->fieldTranslations->nameIn(LanguageCode::RU));
     }
 }

@@ -5,6 +5,21 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2026-06-14
+
+### Added
+- `FieldTranslations` value object exposing SofaScore's embedded
+  `fieldTranslations.nameTranslation` and `fieldTranslations.shortNameTranslation`
+  dictionaries as typed `array<string, string>` maps.
+- `LanguageCode` constant catalogue for known SofaScore locale codes (base set
+  `en`, `ru`, `sr` plus the codes observed in real API responses), with a
+  `label()` helper mapping codes to full language names.
+- `Cast::stringMap()` helper for normalising JSON object/empty-array shapes into
+  `array<string, string>`.
+- `Team`, `Player`, `Tournament`, `Category` and `Event` DTOs now expose a typed
+  `?FieldTranslations $fieldTranslations` property parsed from the API payload.
+  The raw payload is still preserved unchanged in `$raw` / `toArray()`.
+
 ## [2.1.0] - 2026-06-13
 
 ### Added
@@ -96,6 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Symfony bundle integration (`SofascoreApiBundle`) with autowired services and a
   configuration tree for the transport and decorators.
 
+[2.4.0]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v2.4.0
 [2.0.0]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v2.0.0
 [1.1.0]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.1.0
 [1.0.2]: https://github.com/nietonchique/Sofascore-API-Bundle/releases/tag/v1.0.2

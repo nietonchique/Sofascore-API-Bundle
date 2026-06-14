@@ -29,6 +29,7 @@ final readonly class Team
         public ?Country $country,
         public ?Category $category,
         public ?TeamColors $teamColors,
+        public ?FieldTranslations $fieldTranslations = null,
         public array $raw = [],
     ) {
     }
@@ -42,24 +43,26 @@ final readonly class Team
         $country = Cast::array($data['country'] ?? null);
         $category = Cast::array($data['category'] ?? null);
         $teamColors = Cast::array($data['teamColors'] ?? null);
+        $fieldTranslations = Cast::array($data['fieldTranslations'] ?? null);
 
         return new self(
-            Cast::int($data['id'] ?? null),
-            Cast::string($data['name'] ?? null),
-            Cast::string($data['shortName'] ?? null),
-            Cast::string($data['fullName'] ?? null),
-            Cast::string($data['slug'] ?? null),
-            Cast::string($data['nameCode'] ?? null),
-            Cast::string($data['gender'] ?? null),
-            Cast::int($data['type'] ?? null),
-            Cast::bool($data['national'] ?? false),
-            Cast::bool($data['disabled'] ?? false),
-            Cast::int($data['userCount'] ?? null),
-            null !== $sport ? Sport::fromArray($sport) : null,
-            null !== $country ? Country::fromArray($country) : null,
-            null !== $category ? Category::fromArray($category) : null,
-            null !== $teamColors ? TeamColors::fromArray($teamColors) : null,
-            $data,
+            id: Cast::int($data['id'] ?? null),
+            name: Cast::string($data['name'] ?? null),
+            shortName: Cast::string($data['shortName'] ?? null),
+            fullName: Cast::string($data['fullName'] ?? null),
+            slug: Cast::string($data['slug'] ?? null),
+            nameCode: Cast::string($data['nameCode'] ?? null),
+            gender: Cast::string($data['gender'] ?? null),
+            type: Cast::int($data['type'] ?? null),
+            national: Cast::bool($data['national'] ?? false),
+            disabled: Cast::bool($data['disabled'] ?? false),
+            userCount: Cast::int($data['userCount'] ?? null),
+            sport: null !== $sport ? Sport::fromArray($sport) : null,
+            country: null !== $country ? Country::fromArray($country) : null,
+            category: null !== $category ? Category::fromArray($category) : null,
+            teamColors: null !== $teamColors ? TeamColors::fromArray($teamColors) : null,
+            fieldTranslations: null !== $fieldTranslations ? FieldTranslations::fromArray($fieldTranslations) : null,
+            raw: $data,
         );
     }
 

@@ -30,6 +30,7 @@ final readonly class Player
         public ?int $userCount,
         public ?Country $country,
         public ?Team $team,
+        public ?FieldTranslations $fieldTranslations = null,
         public array $raw = [],
     ) {
     }
@@ -41,26 +42,28 @@ final readonly class Player
     {
         $country = Cast::array($data['country'] ?? null);
         $team = Cast::array($data['team'] ?? null);
+        $fieldTranslations = Cast::array($data['fieldTranslations'] ?? null);
 
         return new self(
-            Cast::int($data['id'] ?? null),
-            Cast::string($data['name'] ?? null),
-            Cast::string($data['shortName'] ?? null),
-            Cast::string($data['slug'] ?? null),
-            Cast::string($data['position'] ?? null),
+            id: Cast::int($data['id'] ?? null),
+            name: Cast::string($data['name'] ?? null),
+            shortName: Cast::string($data['shortName'] ?? null),
+            slug: Cast::string($data['slug'] ?? null),
+            position: Cast::string($data['position'] ?? null),
             // SofaScore sends jerseyNumber as a string (e.g. "7"); shirtNumber is the int.
-            Cast::string($data['jerseyNumber'] ?? null),
-            Cast::int($data['shirtNumber'] ?? null),
-            Cast::int($data['height'] ?? null),
-            Cast::string($data['dateOfBirth'] ?? null),
-            Cast::int($data['dateOfBirthTimestamp'] ?? null),
-            Cast::int($data['contractUntilTimestamp'] ?? null),
-            Cast::string($data['gender'] ?? null),
-            Cast::bool($data['deceased'] ?? false),
-            Cast::int($data['userCount'] ?? null),
-            null !== $country ? Country::fromArray($country) : null,
-            null !== $team ? Team::fromArray($team) : null,
-            $data,
+            jerseyNumber: Cast::string($data['jerseyNumber'] ?? null),
+            shirtNumber: Cast::int($data['shirtNumber'] ?? null),
+            height: Cast::int($data['height'] ?? null),
+            dateOfBirth: Cast::string($data['dateOfBirth'] ?? null),
+            dateOfBirthTimestamp: Cast::int($data['dateOfBirthTimestamp'] ?? null),
+            contractUntilTimestamp: Cast::int($data['contractUntilTimestamp'] ?? null),
+            gender: Cast::string($data['gender'] ?? null),
+            deceased: Cast::bool($data['deceased'] ?? false),
+            userCount: Cast::int($data['userCount'] ?? null),
+            country: null !== $country ? Country::fromArray($country) : null,
+            team: null !== $team ? Team::fromArray($team) : null,
+            fieldTranslations: null !== $fieldTranslations ? FieldTranslations::fromArray($fieldTranslations) : null,
+            raw: $data,
         );
     }
 

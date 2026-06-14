@@ -52,4 +52,25 @@ final class Cast
     {
         return \is_array($value) ? $value : null;
     }
+
+    /**
+     * @return array<string, string>
+     */
+    public static function stringMap(mixed $value): array
+    {
+        $array = self::array($value);
+        if (null === $array) {
+            return [];
+        }
+
+        $result = [];
+        foreach ($array as $key => $item) {
+            $string = self::string($item);
+            if (null !== $string && \is_string($key)) {
+                $result[$key] = $string;
+            }
+        }
+
+        return $result;
+    }
 }
