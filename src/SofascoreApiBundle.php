@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Nietonchique\SofascoreApiBundle;
 
+use Nietonchique\SofascoreApiBundle\Client\ImageClient;
 use Nietonchique\SofascoreApiBundle\Endpoint\AmericanFootball;
 use Nietonchique\SofascoreApiBundle\Endpoint\Baseball;
 use Nietonchique\SofascoreApiBundle\Endpoint\Basketball;
@@ -230,6 +231,11 @@ final class SofascoreApiBundle extends AbstractBundle
         $services->set(SofascoreClient::class)
             ->args([service(TransportInterface::class), service(Enums::class)])
             ->public();
+
+        $services->set($p.'.image_client', ImageClient::class)
+            ->args([service($clientId), $baseUrl, $headers, $requestedWith])
+            ->public();
+        $services->alias(ImageClient::class, $p.'.image_client')->public();
 
         foreach (self::AUTOWIRED_ENDPOINTS as $class) {
             $services->set($class)
