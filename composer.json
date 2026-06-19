@@ -1,7 +1,6 @@
 {
     "name": "nietonchique/sofascore-api-bundle",
     "description": "Symfony bundle and standalone PHP client for the unofficial SofaScore API: matches, players, teams, tournaments and live per-sport statistics, with a pluggable HTTP / headless-Chrome transport.",
-    "version": "2.4.0",
     "type": "symfony-bundle",
     "keywords": ["sofascore", "sports", "api", "football", "soccer", "symfony-bundle", "client"],
     "license": "MIT",
@@ -58,7 +57,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-main": "1.0-dev"
+            "dev-master": "2.x-dev"
         }
     },
     "scripts": {
