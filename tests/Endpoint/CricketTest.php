@@ -69,7 +69,7 @@ final class CricketTest extends TestCase
     {
         $this->endpoint->matchesByDate('ice-hockey', '2025-01-31');
 
-        self::assertSame('/sport/ice-hockey/scheduled-events/2025-01-31', $this->transport->lastEndpoint());
+        self::assertSame('/sport/ice-hockey/scheduled-tournaments/2025-01-31/page/1', $this->transport->lastEndpoint());
     }
 
     public function testMatchesByDateDefaultsSportAndDate(): void
@@ -77,14 +77,14 @@ final class CricketTest extends TestCase
         $today = (new DateTimeImmutable())->format('Y-m-d');
         $this->endpoint->matchesByDate();
 
-        self::assertSame("/sport/cricket/scheduled-events/{$today}", $this->transport->lastEndpoint());
+        self::assertSame("/sport/cricket/scheduled-tournaments/{$today}/page/1", $this->transport->lastEndpoint());
     }
 
     public function testMatchesByDateNormalisesSportSlug(): void
     {
         $this->endpoint->matchesByDate('Ice Hockey', '2025-01-31');
 
-        self::assertSame('/sport/ice-hockey/scheduled-events/2025-01-31', $this->transport->lastEndpoint());
+        self::assertSame('/sport/ice-hockey/scheduled-tournaments/2025-01-31/page/1', $this->transport->lastEndpoint());
     }
 
     public function testMatchesByDateRejectsInvalidSport(): void

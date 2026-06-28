@@ -81,7 +81,7 @@ final class SofascoreApiBundle extends AbstractBundle
                     ->scalarNode('proxy')->defaultNull()->end()
                     ->scalarNode('user_agent')->info('Override the default browser User-Agent.')->defaultNull()->end()
                     ->scalarNode('x_requested_with')->info('Value for the required X-Requested-With header (default: a random token).')->defaultNull()->end()
-                    ->arrayNode('headers')->scalarPrototype()->end()->end()
+                    ->arrayNode('headers')->normalizeKeys(false)->scalarPrototype()->end()->end()
                 ->end()->end()
                 ->arrayNode('chrome')->addDefaultsIfNotSet()->children()
                     ->scalarNode('binary')->defaultValue('google-chrome-stable')->cannotBeEmpty()->end()

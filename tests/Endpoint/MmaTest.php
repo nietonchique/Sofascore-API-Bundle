@@ -54,14 +54,14 @@ final class MmaTest extends TestCase
         $this->endpoint->fightsByDate();
 
         $expectedDate = (new DateTimeImmutable())->format('Y-m-d');
-        self::assertSame("/sport/mma/scheduled-events/{$expectedDate}", $this->transport->lastEndpoint());
+        self::assertSame("/sport/mma/scheduled-tournaments/{$expectedDate}/page/1", $this->transport->lastEndpoint());
     }
 
     public function testFightsByDateWithSportAndDate(): void
     {
         $this->endpoint->fightsByDate('football', '2025-02-06');
 
-        self::assertSame('/sport/football/scheduled-events/2025-02-06', $this->transport->lastEndpoint());
+        self::assertSame('/sport/football/scheduled-tournaments/2025-02-06/page/1', $this->transport->lastEndpoint());
     }
 
     public function testFightsByDateRejectsInvalidSport(): void

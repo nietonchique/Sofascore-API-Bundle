@@ -33,18 +33,26 @@ final class MockTransport implements TransportInterface
         $this->response = $response;
     }
 
+    /**
+     * @param list<array<array-key, mixed>> $responses
+     */
+    public function setResponses(array $responses): void
+    {
+        $this->response = $responses;
+    }
+
     public function get(string $endpoint, array $query = []): array
     {
         $this->calls[] = ['endpoint' => $endpoint, 'query' => $query];
 
-        return $this->response;
+        return $this->nextResponse();
     }
 
     public function getRaw(string $url): array
     {
         $this->calls[] = ['endpoint' => $url, 'query' => []];
 
-        return $this->response;
+        return $this->nextResponse();
     }
 
     public function lastEndpoint(): ?string
@@ -67,5 +75,20 @@ final class MockTransport implements TransportInterface
     public function callCount(): int
     {
         return \count($this->calls);
+    }
+
+    /**
+     * @return array<array-key, mixed>
+     */
+    private function nextResponse(): array
+    {
+        if (array_is_list($this->response) && [] !== $this->response && \is_array($this->response[0] ?? null)) {
+            /** @var array<array-key, mixed> $response */
+            $response = array_shift($this->response);
+
+            return $response;
+        }
+
+        return $this->response;
     }
 }

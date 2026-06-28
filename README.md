@@ -56,6 +56,7 @@ $event   = $client->match(12436870)->getMatch();   // Dto\Event
 $h2h     = $client->match(12436870)->h2h();         // array
 $team    = $client->team(42)->getTeam();            // Dto\Team
 $games   = $client->basketball()->gamesByDate('basketball', '2026-01-15');
+$events  = $client->match()->scheduledEventsByDate('football', '2026-06-28');
 ```
 
 ### In Symfony (dependency injection)
@@ -132,8 +133,9 @@ $team?->fieldTranslations?->nameIn('xx', 'fallback');        // 'fallback'
 (including the base set `en`, `ru`, `sr` and the codes observed in real responses).
 You can still pass any arbitrary string to `nameIn()` / `shortNameIn()`.
 
-For methods that return raw arrays (e.g. `match()->gamesByDate()`), the
-`fieldTranslations` key is preserved in the response unchanged.
+For methods that return raw arrays (e.g. `match()->gamesByDate()` /
+`match()->scheduledEventsByDate()`), the `fieldTranslations` key is preserved in
+the response unchanged.
 
 ## Error handling
 

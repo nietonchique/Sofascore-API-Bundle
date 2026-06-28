@@ -48,7 +48,7 @@ final class AmericanFootballTest extends TestCase
     {
         $this->endpoint->matchesByDate('tennis', '2025-01-31');
 
-        self::assertSame('/sport/tennis/scheduled-events/2025-01-31', $this->transport->lastEndpoint());
+        self::assertSame('/sport/tennis/scheduled-tournaments/2025-01-31/page/1', $this->transport->lastEndpoint());
     }
 
     public function testMatchesByDateDefaultsSportToAmericanFootballAndDateToToday(): void
@@ -56,7 +56,7 @@ final class AmericanFootballTest extends TestCase
         $today = (new DateTimeImmutable())->format('Y-m-d');
         $this->endpoint->matchesByDate();
 
-        self::assertSame("/sport/american-football/scheduled-events/{$today}", $this->transport->lastEndpoint());
+        self::assertSame("/sport/american-football/scheduled-tournaments/{$today}/page/1", $this->transport->lastEndpoint());
     }
 
     public function testMatchesByDateRejectsInvalidSport(): void

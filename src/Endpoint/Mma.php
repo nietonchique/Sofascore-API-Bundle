@@ -47,13 +47,7 @@ final class Mma extends AbstractEndpoint
      */
     public function fightsByDate(string $sport = 'mma', ?string $date = null): array
     {
-        $date ??= $this->today();
-        $sport = $this->enums->assertSport($sport);
-
-        /** @var array<string, mixed> $data */
-        $data = $this->get("/sport/{$sport}/scheduled-events/{$date}");
-
-        return $data;
+        return $this->getScheduledEventsByDate($sport, $date);
     }
 
     /**

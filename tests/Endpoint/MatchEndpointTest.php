@@ -52,7 +52,66 @@ final class MatchEndpointTest extends TestCase
     {
         $this->endpoint->gamesByDate('Football', '2025-01-31');
 
-        self::assertSame('/sport/football/scheduled-events/2025-01-31', $this->transport->lastEndpoint());
+        self::assertSame('/sport/football/scheduled-tournaments/2025-01-31/page/1', $this->transport->lastEndpoint());
+    }
+
+    public function testScheduledTournamentsByDateUsesCurrentCalendarEndpoint(): void
+    {
+        $this->endpoint->scheduledTournamentsByDate('Football', '2026-06-28', 3);
+
+        self::assertSame('/sport/football/scheduled-tournaments/2026-06-28/page/3', $this->transport->lastEndpoint());
+    }
+
+    public function testGamesByDateFlattensCurrentScheduledTournamentEvents(): void
+    {
+        $this->transport->setResponses([
+            [
+                'scheduled' => [
+                    [
+                        'tournament' => [
+                            'id' => 3948,
+                            'uniqueTournament' => ['id' => 16],
+                        ],
+                    ],
+                    [
+                        'tournament' => ['id' => 54661],
+                    ],
+                    [
+                        'events' => [
+                            ['id' => 15186734, 'slug' => 'inline-event'],
+                        ],
+                    ],
+                ],
+                'hasNextPage' => true,
+            ],
+            ['events' => [
+                ['id' => 15186734, 'slug' => 'duplicate-event'],
+                ['id' => 15186747, 'slug' => 'world-cup-event'],
+            ]],
+            ['events' => [
+                ['id' => 15187000, 'slug' => 'national-tournament-event'],
+            ]],
+            [
+                'scheduled' => [],
+                'hasNextPage' => false,
+            ],
+        ]);
+
+        $result = $this->endpoint->gamesByDate('Football', '2026-06-28');
+
+        self::assertSame([
+            'events' => [
+                ['id' => 15186734, 'slug' => 'duplicate-event'],
+                ['id' => 15186747, 'slug' => 'world-cup-event'],
+                ['id' => 15187000, 'slug' => 'national-tournament-event'],
+            ],
+        ], $result);
+        self::assertSame([
+            '/sport/football/scheduled-tournaments/2026-06-28/page/1',
+            '/unique-tournament/16/scheduled-events/2026-06-28',
+            '/tournament/54661/scheduled-events/2026-06-28',
+            '/sport/football/scheduled-tournaments/2026-06-28/page/2',
+        ], array_column($this->transport->calls, 'endpoint'));
     }
 
     public function testGamesByDateDefaultsToToday(): void
@@ -60,7 +119,7 @@ final class MatchEndpointTest extends TestCase
         $today = (new DateTimeImmutable())->format('Y-m-d');
         $this->endpoint->gamesByDate('football');
 
-        self::assertSame("/sport/football/scheduled-events/{$today}", $this->transport->lastEndpoint());
+        self::assertSame("/sport/football/scheduled-tournaments/{$today}/page/1", $this->transport->lastEndpoint());
     }
 
     public function testGamesByDateRejectsUnknownSport(): void

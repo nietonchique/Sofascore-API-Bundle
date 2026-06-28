@@ -60,13 +60,27 @@ final class MatchEndpoint extends AbstractEndpoint
      */
     public function gamesByDate(string $sport, ?string $date = null): array
     {
-        $date ??= $this->today();
-        $sport = $this->enums->assertSport($sport);
+        return $this->getScheduledEventsByDate($sport, $date);
+    }
 
-        /** @var array<string, mixed> $data */
-        $data = $this->get("/sport/{$sport}/scheduled-events/{$date}");
+    /**
+     * Scheduled tournament buckets for a sport and date.
+     *
+     * @return array<string, mixed>
+     */
+    public function scheduledTournamentsByDate(string $sport, ?string $date = null, int $page = 1): array
+    {
+        return $this->getScheduledTournamentsByDate($sport, $date, $page);
+    }
 
-        return $data;
+    /**
+     * Flattened events for a sport and date, using the current scheduled tournament calendar.
+     *
+     * @return array{events: list<array<string, mixed>>}
+     */
+    public function scheduledEventsByDate(string $sport, ?string $date = null): array
+    {
+        return $this->getScheduledEventsByDate($sport, $date);
     }
 
     /**

@@ -26,6 +26,7 @@ use Nietonchique\SofascoreApiBundle\Transport\HttpClientTransport;
 use Nietonchique\SofascoreApiBundle\Transport\TransportInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -53,6 +54,30 @@ final class BundleIntegrationTest extends TestCase
         $container = $this->boot(['transport' => 'http']);
 
         self::assertInstanceOf(HttpClientTransport::class, $container->get(TransportInterface::class));
+    }
+
+    public function testHttpHeadersPreserveBrowserHeaderNames(): void
+    {
+        $transport = $this->boot([
+            'transport' => 'http',
+            'http' => [
+                'headers' => [
+                    'Accept-Language' => 'en-US,en;q=0.9',
+                    'sec-ch-ua' => '"Chromium";v="148"',
+                ],
+            ],
+        ])->get(TransportInterface::class);
+
+        self::assertInstanceOf(HttpClientTransport::class, $transport);
+
+        $headersProperty = new ReflectionProperty($transport, 'headers');
+        $headers = $headersProperty->getValue($transport);
+
+        self::assertIsArray($headers);
+        self::assertArrayHasKey('Accept-Language', $headers);
+        self::assertArrayHasKey('sec-ch-ua', $headers);
+        self::assertArrayNotHasKey('Accept_Language', $headers);
+        self::assertArrayNotHasKey('sec_ch_ua', $headers);
     }
 
     public function testLoggingDecoratorIsWiredWhenEnabled(): void

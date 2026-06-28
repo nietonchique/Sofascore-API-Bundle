@@ -61,13 +61,7 @@ final class Esports extends AbstractEndpoint
      */
     public function matchesByDate(string $sport = 'esports', ?string $date = null): array
     {
-        $date ??= $this->today();
-        $sport = $this->enums->assertSport($sport);
-
-        /** @var array<string, mixed> $data */
-        $data = $this->get("/sport/{$sport}/scheduled-events/{$date}");
-
-        return $data;
+        return $this->getScheduledEventsByDate($sport, $date);
     }
 
     /**
